@@ -45,5 +45,11 @@ for index, row in constituents_df.iterrows():
 print(sector_companies)
 
 class Stock_analysis():
+
+
+    asdfasdf
+    asd
+    asdfa
+    sdfasdfasdf
     
 # if __name__ == '__main__':
