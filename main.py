@@ -16,10 +16,6 @@ companies = constituents_df['Name'].to_dict()
 #     title = '{}.csv'.format(key)
 #     df.to_csv(title)
 
-dfs = {}
-for key in companies:
-    file = '{}.csv'.format(key)
-    dfs.update({'{}_DF'.format(key):pd.read_csv(file, index_col=0, parse_dates=True)})
 
 # Lines below will plot the Adj Close of the AAP data frame
 #plt.plot(dfs['AAP_DF'].index,dfs['AAP_DF']['Adj Close'], label = 'AAP')
@@ -30,20 +26,55 @@ for key in companies:
 #    plt.plot(dfs[key].index, dfs[key]['Adj Close'], label=key)
 #    plt.show()
 
-for values in sector_names:
-    print(values, sep ='\n')
-
-sector_choice = input('Please enter which sector you would like to analyze: ')
-sector_choice = sector_choice.lower()
-sector_companies = []
-
-for index, row in constituents_df.iterrows():
-    if row['Sector'] == sector_choice:
-        in_the_sector = row['Symbol']
-        sector_companies.append(in_the_sector)
-
-print(sector_companies)
+one_large_df = pd.DataFrame()
 
 class Stock_analysis():
-    
+    global one_large_df
+
+    def __init__(self, one_large_df):
+        self.one_large_df = one_large_df
+
+    def create_df (self):
+        for key in companies:
+            file = '{}.csv'.format(key)
+            stock_df = pd.read_csv(file, index_col=0, parse_dates=True)
+            # stock_df.insert(len(stock_df.columns),'Ticker', [key], True)
+            one_large_df.append(stock_df)
+
+    def pick_sector(self):
+
+        for values in sector_names:
+            print(values, sep='\n')
+
+        sector_choice = input('Please enter which sector you would like to analyze: ')
+        sector_choice = sector_choice.lower()
+        sector_companies = []
+
+        for index, row in constituents_df.iterrows():
+            if row['Sector'] == sector_choice:
+                in_the_sector = row['Symbol']
+                sector_companies.append(in_the_sector)
+
+    # def plot_sector(self):
+    #     temp_df = pd.DataFrame()
+    #     for index, row in one_large_df.iterrows():
+    #         if row['Ticker'] in sector_companies:
+    #             plt.plot(one_large_df['Adj Close'], label = )
+    #             plt.show()
+
+
+    def daily_best(self):
+        one_large_df['Daily Return'] = one_large_df['Adj Close'].pct_change()
+        column = one_large_df['Daily Return']
+        max_value = column.max()
+
+# -------- L O G I C --------
+
+analysis = Stock_analysis(one_large_df)
+
+analysis.create_df()
+
+print (one_large_df)
+
+analysis.pick_sector()
 # if __name__ == '__main__':
