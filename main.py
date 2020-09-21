@@ -26,22 +26,20 @@ companies = constituents_df['Name'].to_dict()
 #    plt.plot(dfs[key].index, dfs[key]['Adj Close'], label=key)
 #    plt.show()
 
-one_large_df = pd.DataFrame()
 
-class Stock_analysis():
-    global one_large_df
-
-    def __init__(self, one_large_df):
+class StockAnalysis:
+    def __init__(self, one_large_df = pd.DataFrame()):
         self.one_large_df = one_large_df
 
-    def create_df (self):
+    def create_df(self):
         for key in companies:
             file = '{}.csv'.format(key)
             stock_df = pd.read_csv(file, index_col=0, parse_dates=True)
             # stock_df.insert(len(stock_df.columns),'Ticker', [key], True)
-            one_large_df.append(stock_df)
+            self.one_large_df.append(stock_df)
 
-    def pick_sector(self):
+    @staticmethod
+    def pick_sector():
 
         for values in sector_names:
             print(values, sep='\n')
@@ -62,19 +60,20 @@ class Stock_analysis():
     #             plt.plot(one_large_df['Adj Close'], label = )
     #             plt.show()
 
-
-    def daily_best(self):
+    @staticmethod
+    def daily_best(one_large_df):
         one_large_df['Daily Return'] = one_large_df['Adj Close'].pct_change()
         column = one_large_df['Daily Return']
         max_value = column.max()
+        return max_value
 
 # -------- L O G I C --------
 
-analysis = Stock_analysis(one_large_df)
+analysis = StockAnalysis()
 
 analysis.create_df()
 
-print (one_large_df)
+print(one_large_df)
 
 analysis.pick_sector()
 # if __name__ == '__main__':
