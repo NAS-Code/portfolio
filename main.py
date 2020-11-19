@@ -1,4 +1,4 @@
-import datetime as dt
+import datetime
 import pandas as pd
 import pandas_datareader.data as web
 import matplotlib.pyplot as plt
@@ -28,15 +28,18 @@ companies = constituents_df['Name'].to_dict()
 
 
 class StockAnalysis:
-    def __init__(self, one_large_df = pd.DataFrame()):
+    def __init__(self, sector_companies = [], one_large_df = pd.DataFrame()):
         self.one_large_df = one_large_df
+        self.sector_companies = sector_companies
 
     def create_df(self):
         for key in companies:
             file = '{}.csv'.format(key)
             stock_df = pd.read_csv(file, index_col=0, parse_dates=True)
-            # stock_df.insert(len(stock_df.columns),'Ticker', [key], True)
-            self.one_large_df.append(stock_df)
+            stock_df.insert(6, 'Ticker', key, True)
+            self.one_large_df = self.one_large_df.append(stock_df)
+        print(self.one_large_df)
+        return self.one_large_df
 
     @staticmethod
     def pick_sector():
@@ -49,9 +52,10 @@ class StockAnalysis:
         sector_companies = []
 
         for index, row in constituents_df.iterrows():
-            if row['Sector'] == sector_choice:
-                in_the_sector = row['Symbol']
+            if row['Sector'].lower() == sector_choice:
+                in_the_sector = index
                 sector_companies.append(in_the_sector)
+        return sector_companies
 
     # def plot_sector(self):
     #     temp_df = pd.DataFrame()
@@ -61,19 +65,27 @@ class StockAnalysis:
     #             plt.show()
 
     @staticmethod
-    def daily_best(one_large_df):
+    def daily_best(one_large_df, sector_companies, date_choice = datetime.datetime.utcnow().replace(month = 7, day = 2).date()):
         one_large_df['Daily Return'] = one_large_df['Adj Close'].pct_change()
-        column = one_large_df['Daily Return']
-        max_value = column.max()
-        return max_value
+        sector_highs = []
+
+        for index, row in one_large_df.iterrows():
+            if index == date_choice and row['Ticker'] in sector_companies:
+                high_value = row['Daily Return']
+                sector_highs.append(high_value)
+        max_value = max(sector_highs)
+
+# iterating over a DF takes a lot of time so having to do it twice is unideal
+        for index, row in one_large_df.iterrows():
+            if index == date_choice and max_value == row['Daily Return']:
+                print(index,row)
 
 # -------- L O G I C --------
 
 analysis = StockAnalysis()
 
-analysis.create_df()
+df = analysis.create_df()
+sector = analysis.pick_sector()
+print(analysis.daily_best(df, sector))
 
-print(one_large_df)
-
-analysis.pick_sector()
 # if __name__ == '__main__':
